@@ -1,0 +1,148 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'ahmadandryanto53@guru.sd.belajar.id' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isTeacher() {
+      return isSignedIn() && (
+        isAdmin() ||
+        exists(/databases/$(database)/documents/teachers/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher')
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin() || isTeacher());
+      allow list: if isSignedIn() && (isAdmin() || isTeacher());
+      allow create: if isSignedIn() && (isAdmin() || isOwner(userId));
+      allow update: if isSignedIn() && (isAdmin() || isOwner(userId));
+      allow delete: if isAdmin();
+    }
+
+    // Admins collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Students collection
+    match /students/{studentId} {
+      allow get: if isSignedIn() && (isOwner(studentId) || isAdmin() || isTeacher());
+      allow list: if isSignedIn() && (isAdmin() || isTeacher());
+      allow write: if isAdmin();
+    }
+
+    // Teachers collection
+    match /teachers/{teacherId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Classes collection
+    match /classes/{classId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Subjects collection
+    match /subjects/{subjectId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Question bank (Teachers and Admins only, students must NEVER read master questions/answers)
+    match /questionBanks/{questionId} {
+      allow read: if isTeacher() || isAdmin();
+      allow write: if isTeacher() || isAdmin();
+    }
+
+    // Exams collection
+    match /exams/{examId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isTeacher() || isAdmin();
+    }
+
+    // Exam attempts
+    match /examAttempts/{attemptId} {
+      allow get: if isSignedIn() && (
+        isAdmin() ||
+        isTeacher() ||
+        resource.data.studentUid == request.auth.uid
+      );
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        isTeacher() ||
+        resource.data.studentUid == request.auth.uid
+      );
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        request.resource.data.studentUid == request.auth.uid
+      );
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        isTeacher() ||
+        (
+          resource.data.studentUid == request.auth.uid &&
+          resource.data.status == 'in_progress'
+        )
+      );
+      allow delete: if isAdmin();
+
+      // Answers subcollection
+      match /answers/{questionId} {
+        allow read: if isSignedIn() && (
+          isAdmin() ||
+          isTeacher() ||
+          get(/databases/$(database)/documents/examAttempts/$(attemptId)).data.studentUid == request.auth.uid
+        );
+        allow write: if isSignedIn() && (
+          isAdmin() ||
+          isTeacher() ||
+          (
+            get(/databases/$(database)/documents/examAttempts/$(attemptId)).data.studentUid == request.auth.uid &&
+            get(/databases/$(database)/documents/examAttempts/$(attemptId)).data.status == 'in_progress'
+          )
+        );
+      }
+
+      // Events / violation logs subcollection
+      match /events/{eventId} {
+        allow read: if isSignedIn() && (
+          isAdmin() ||
+          isTeacher() ||
+          get(/databases/$(database)/documents/examAttempts/$(attemptId)).data.studentUid == request.auth.uid
+        );
+        allow create: if isSignedIn();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Audit logs
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if false; // immutable logs
+    }
+  }
+}

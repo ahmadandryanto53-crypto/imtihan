@@ -1,0 +1,6 @@
+{
+  "name": "إمتحان (Imtihan) - CBT Online",
+  "description": "Sistem Ujian Online Terintegrasi untuk SD, SMP, dan SMA",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,236 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role and basic metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["student", "teacher", "admin"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "fullName", "role", "status"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrators",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "nis": { "type": "string", "maxLength": 64 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "educationLevel": { "type": "string", "enum": ["SD", "SMP", "SMA"] },
+        "gradeLevel": { "type": "string", "maxLength": 16 },
+        "classId": { "type": "string", "maxLength": 128 },
+        "className": { "type": "string", "maxLength": 64 },
+        "academicYear": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "nis", "fullName", "educationLevel", "gradeLevel", "classId", "status"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Teacher profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "nip": { "type": "string", "maxLength": 64 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "subjects": { "type": "string", "maxLength": 256 },
+        "assignedClasses": { "type": "string", "maxLength": 256 },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "fullName", "email", "status"]
+    },
+    "SchoolClass": {
+      "title": "SchoolClass",
+      "description": "Classroom metadata",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 64 },
+        "educationLevel": { "type": "string", "enum": ["SD", "SMP", "SMA"] },
+        "grade": { "type": "string", "maxLength": 16 },
+        "academicYear": { "type": "string", "maxLength": 32 },
+        "homeroomTeacher": { "type": "string", "maxLength": 128 },
+        "studentCount": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "educationLevel", "grade", "academicYear"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Subject courses",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "maxLength": 32 },
+        "name": { "type": "string", "maxLength": 128 },
+        "educationLevel": { "type": "string", "enum": ["SD", "SMP", "SMA", "ALL"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["code", "name", "educationLevel"]
+    },
+    "QuestionBank": {
+      "title": "QuestionBank",
+      "description": "Stored questions",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "subject": { "type": "string", "maxLength": 128 },
+        "educationLevel": { "type": "string", "enum": ["SD", "SMP", "SMA"] },
+        "gradeLevel": { "type": "string", "maxLength": 16 },
+        "type": { "type": "string", "enum": ["single_choice", "multi_choice", "true_false", "short_answer", "essay"] },
+        "questionText": { "type": "string", "maxLength": 4096 },
+        "imageUrl": { "type": "string", "maxLength": 1024 },
+        "options": { "type": "string", "maxLength": 4096 },
+        "correctAnswer": { "type": "string", "maxLength": 2048 },
+        "weight": { "type": "number" },
+        "rubric": { "type": "string", "maxLength": 2048 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["authorUid", "subject", "educationLevel", "gradeLevel", "type", "questionText", "weight"]
+    },
+    "Exam": {
+      "title": "Exam",
+      "description": "Online examination config",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 1024 },
+        "teacherUid": { "type": "string", "maxLength": 128 },
+        "teacherName": { "type": "string", "maxLength": 128 },
+        "subject": { "type": "string", "maxLength": 128 },
+        "educationLevel": { "type": "string", "enum": ["SD", "SMP", "SMA"] },
+        "gradeLevel": { "type": "string", "maxLength": 16 },
+        "classIds": { "type": "string", "maxLength": 512 },
+        "startTime": { "type": "string", "maxLength": 64 },
+        "endTime": { "type": "string", "maxLength": 64 },
+        "durationMinutes": { "type": "number" },
+        "token": { "type": "string", "maxLength": 32 },
+        "maxViolations": { "type": "number" },
+        "shuffleQuestions": { "type": "boolean" },
+        "shuffleOptions": { "type": "boolean" },
+        "showScoreAfterExam": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["draft", "scheduled", "active", "completed", "archived"] },
+        "questionCount": { "type": "number" },
+        "questions": { "type": "string", "maxLength": 65536 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "teacherUid", "subject", "educationLevel", "gradeLevel", "durationMinutes", "token", "status"]
+    },
+    "ExamAttempt": {
+      "title": "ExamAttempt",
+      "description": "Student exam participation session",
+      "type": "object",
+      "properties": {
+        "examId": { "type": "string", "maxLength": 128 },
+        "studentUid": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 128 },
+        "studentNis": { "type": "string", "maxLength": 64 },
+        "examTitle": { "type": "string", "maxLength": 128 },
+        "subject": { "type": "string", "maxLength": 128 },
+        "educationLevel": { "type": "string", "maxLength": 16 },
+        "gradeLevel": { "type": "string", "maxLength": 16 },
+        "className": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["in_progress", "submitted", "terminated_violation", "time_expired"] },
+        "startedAt": { "type": "string" },
+        "deadlineAt": { "type": "string" },
+        "submittedAt": { "type": "string" },
+        "lastActivityAt": { "type": "string" },
+        "violationCount": { "type": "number" },
+        "lastQuestionIndex": { "type": "number" },
+        "answeredCount": { "type": "number" },
+        "terminationReason": { "type": "string", "maxLength": 256 },
+        "objectiveScore": { "type": "number" },
+        "essayScore": { "type": "number" },
+        "finalScore": { "type": "number" },
+        "scoringStatus": { "type": "string", "enum": ["pending", "needs_grading", "completed"] }
+      },
+      "required": ["examId", "studentUid", "status", "startedAt", "deadlineAt"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security and administrative audit trail",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string", "maxLength": 64 },
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 128 },
+        "actorRole": { "type": "string", "maxLength": 32 },
+        "details": { "type": "string", "maxLength": 1024 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["action", "actorUid", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile with role"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Designated administrators"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Student profile data"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Teacher profile data"
+    },
+    "/classes/{classId}": {
+      "schema": "SchoolClass",
+      "description": "School classes"
+    },
+    "/subjects/{subjectId}": {
+      "schema": "Subject",
+      "description": "School subjects"
+    },
+    "/questionBanks/{questionId}": {
+      "schema": "QuestionBank",
+      "description": "Master question bank"
+    },
+    "/exams/{examId}": {
+      "schema": "Exam",
+      "description": "Exams configuration"
+    },
+    "/examAttempts/{attemptId}": {
+      "schema": "ExamAttempt",
+      "description": "Individual student test attempt"
+    },
+    "/examAttempts/{attemptId}/answers/{questionId}": {
+      "schema": "Answer",
+      "description": "Individual answer to a question"
+    },
+    "/examAttempts/{attemptId}/events/{eventId}": {
+      "schema": "Event",
+      "description": "Violations and exam session logs"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "System audit logs"
+    }
+  }
+}
